@@ -80,10 +80,12 @@ def process_query(query):
     special_cases = [
         r'overview of (.+) movie', #capturing movie_name for retrieving its overviews
         r'overview of (.+)',  #Alternate-query of overview of movies: capturing movie_name for retrieving its overviews
-        r'top 5 movies from year (\d{4})' # this will capture the release year for searching top 5 movies corresponds to it.
-        r'movies of actor (.+)', # this will capture the actor's name for searching his top 7 movies 
-        r'movies of actress (.+)'  # this will capture the actor's name for searching his top 7 movies
+        r'top 5 movies from year (\d{4})', # this will capture the release year for searching top 5 movies corresponds to it.
+        # this will capture the actress'/actor's name for searching his top 7 movies
+        r'movies of (actor|actress) (.+)',  # Flexible match for both actor and actress
+        r'movies of (.+)'  # Catch-all for other cases like actor/actress with misspelling  //fallback for other cases
     ]
+  
     #his loop iterates through each regex pattern in the special_cases list.
     #re.search(case, query) attempts to match the regex pattern (case) to the query.
     for case in special_cases:
@@ -93,8 +95,8 @@ def process_query(query):
             if case == r'top 5 movies from year (\d{4})':
                 # If the case is for capturing the year, return the year directly without correction
                 return match.group(1)
-            elif case in [r'movies of actor (.+)', r'movies of actress (.+)']:
-                actor_name = match.group(1) # capture actor/actress name 
+            elif case in [r'movies of (actor|actress) (.+)', r'movies of (.+)']:
+                actor_name = match.group(2) if case == r'movies of (actor|actress) (.+)' else match.group(1)# capture actor/actress name 
                 corrected_actor_name = complete_correct_actors(actor_name)# then comple and correct the actor/actress name by passing captured name to the function: complete_correct_actors.
                 return corrected_actor_name # retrun corrected name.
             else:
@@ -105,7 +107,7 @@ def process_query(query):
                 return corrected_query  # then finally returning the corrected query
 
             
-
+    # Fallback to default prompt processing if explicit actor/actress query check and regex cases based match won't satisfied by user query:-
     #first of all structuring our prompt with the help of this auxilliary-prompt
     prompt = f"Extract the main keyword or complete the movie name for database search from the following user query:\n\nUser Query: \"{query}\"\n\nKeyword:-"
     print(f"Processing query with prompt: {prompt}")
@@ -267,7 +269,9 @@ def search_movies_by_actor(query):
     # The ILIKE operator works with text columns, but your top_5_actors column is likely a text[] array, not a plain text field.
     #To fix this, you need to modify the query to check each element of the array. In PostgreSQL, you can use the ANY operator to match values within arrays.
     #instead of using this in query " top_5_actors ILIKE '%{actor_name}%'"...."  we will use " '%{actor_name}%' ILIKE ANY(top_5_actors)"
-    keyword_query = f"'%{actor_name}%' ILIKE ANY(top_5_actors)"
+    keyword_query = f"'{actor_name}' ILIKE ANY(top_5_actors)"
+    #The '%{actor_name}%' part was only useful for pattern matching in strings, but since top_5_actors is an array, using ILIKE ANY() already checks for any occurrence of the actor_name in the array.
+    # Thus, no wildcards are needed.
     final_query = f"""
         SELECT * FROM movies.movies
         WHERE {keyword_query}
@@ -352,7 +356,7 @@ def main():
             formatted_top_movies_results = format_results(top_movies_results)
             display_str = display_results(formatted_top_movies_results, [])
             print(display_str)
-        elif "movies of actor" in user_query.lower() or "movies of actress" in user_query.lower():
+        elif "movies of actor" in user_query.lower() or "movies of actress" in user_query.lower() or "movies of" in user_query.lower():
             movies_by_actor_results = search_movies_by_actor(user_query)
             if not movies_by_actor_results:
                 print("No results found for actor/actress.")
