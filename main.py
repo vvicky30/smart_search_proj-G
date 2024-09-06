@@ -53,20 +53,20 @@ def complete_correct(movie_name):
         return movie_name  # If there's an error, return the original movie name ; the movie name which's entered by user while querying 
 # Function to correct and complete actor/actress names
 def complete_correct_actors(actor_name):
-    prompt = f"Correct the spelling or complete the actor/actress name: '{actor_name}'"
+    prompt = f"Correct the spelling or complete the actor/actress name: '{actor_name}'" # auxilliary prompt for directing chat-gpt for completing and correct the spelling of actor/actress
     
     try:
         completion = client.completions.create(
             model="gpt-3.5-turbo-instruct",
             prompt=prompt,
-            max_tokens=8
+            max_tokens=6  # Limiting the response to ensure it's concise
         )
-        corrected_actor_name = completion.choices[0].text.strip().split('\n')[0]
+        corrected_actor_name = completion.choices[0].text.strip().split('\n')[0] # Get the first line of response
         print(f"Corrected/Completed Actor/Actress Name: '{corrected_actor_name}'")
         return corrected_actor_name
     except Exception as e:
         print(f"ERROR in correcting/completing actor/actress name: {e}")
-        return actor_name
+        return actor_name # if there is error in completing and correcting the actor/actress name then return original actor-name which was used by user while querying.
 
 def process_query(query): 
     # this function is take raw user's query and extract text from it .
@@ -78,9 +78,11 @@ def process_query(query):
     #This defines a list of regular expressions (regex) to identify specific patterns in the query. 
     #Each regex pattern is a string that describes a search pattern.
     special_cases = [
-        r'overview of (.+) movie',
-        r'overview of (.+)',
-        r'top 5 movies from year (\d{4})'
+        r'overview of (.+) movie', #capturing movie_name for retrieving its overviews
+        r'overview of (.+)',  #Alternate-query of overview of movies: capturing movie_name for retrieving its overviews
+        r'top 5 movies from year (\d{4})' # this will capture the release year for searching top 5 movies corresponds to it.
+        r'movies of actor (.+)', # this will capture the actor's name for searching his top 7 movies 
+        r'movies of actress (.+)'  # this will capture the actor's name for searching his top 7 movies
     ]
     #his loop iterates through each regex pattern in the special_cases list.
     #re.search(case, query) attempts to match the regex pattern (case) to the query.
@@ -91,6 +93,10 @@ def process_query(query):
             if case == r'top 5 movies from year (\d{4})':
                 # If the case is for capturing the year, return the year directly without correction
                 return match.group(1)
+            elif case in [r'movies of actor (.+)', r'movies of actress (.+)']:
+                actor_name = match.group(1) # capture actor/actress name 
+                corrected_actor_name = complete_correct_actors(actor_name)# then comple and correct the actor/actress name by passing captured name to the function: complete_correct_actors.
+                return corrected_actor_name # retrun corrected name.
             else:
                 # For movie names in context of retriving overviews, use the complete_correct function
                 processed_query = match.group(1)
