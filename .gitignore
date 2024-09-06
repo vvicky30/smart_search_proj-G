@@ -1,0 +1,32 @@
+# Python environment
+venv/
+env/
+.venv/
+.env/
+smart_search_env/
+
+# VSCode settings
+.vscode/
+
+# Bytecode files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Logs
+*.log
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Other ignored files
+.pytest_cache/
+*.coverage
+.tox/
+.nox/
+*.coverage.*
+.hypothesis/
+.mypy_cache/
+.pylint.d/
