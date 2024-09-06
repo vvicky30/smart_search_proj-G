@@ -262,7 +262,12 @@ def search_movies_by_actor(query):
     # Strip extra quotes(if any) from the processed query
     # Replace single quotes in the processed query with two single quotes
     actor_name = actor_name.strip('"').replace("'", "''")
-    keyword_query = f"top_5_actors ILIKE '%{actor_name}%'"
+    
+    #The error we’re encountering is due to attempting to use the ILIKE operator with a PostgreSQL array (text[]), which isn't supported directly. 
+    # The ILIKE operator works with text columns, but your top_5_actors column is likely a text[] array, not a plain text field.
+    #To fix this, you need to modify the query to check each element of the array. In PostgreSQL, you can use the ANY operator to match values within arrays.
+    #instead of using this in query " top_5_actors ILIKE '%{actor_name}%'"...."  we will use " '%{actor_name}%' ILIKE ANY(top_5_actors)"
+    keyword_query = f"'%{actor_name}%' ILIKE ANY(top_5_actors)"
     final_query = f"""
         SELECT * FROM movies.movies
         WHERE {keyword_query}
