@@ -252,6 +252,33 @@ def search_top_movies(query):
     except Exception as e:
         print(f"ERROR in searching documents: {e}")
         return []
+    
+# Function to search movies by actor or actress name
+def search_movies_by_actor(query):
+    actor_name = process_query(query)
+    if not actor_name:
+        print("No actor/actress name to search for.")
+        return []
+    # Strip extra quotes(if any) from the processed query
+    # Replace single quotes in the processed query with two single quotes
+    actor_name = actor_name.strip('"').replace("'", "''")
+    keyword_query = f"top_5_actors ILIKE '%{actor_name}%'"
+    final_query = f"""
+        SELECT * FROM movies.movies
+        WHERE {keyword_query}
+        ORDER BY tmdb_rating DESC
+        LIMIT 7
+    """
+    print(f"Executing SQL Query... : {final_query}")
+
+    session = SessionLocal()
+    try:
+        results = session.execute(text(final_query)).fetchall()
+        print(f"Number of results found: {len(results)}")
+        return results
+    except Exception as e:
+        print(f"ERROR in searching for movies by actor/actress: {e}")
+        return []
 #The Decimal issue occurs because SQLAlchemy uses Python's Decimal type for precise decimal arithmetic, which is why it is displaying Decimal('value').
 #To convert it to a float or string for display purposes, 
 #Resolving the problem: This function takes the results and formats any Decimal values to floats.
@@ -319,6 +346,13 @@ def main():
                 print("No results found for top movies.")
             formatted_top_movies_results = format_results(top_movies_results)
             display_str = display_results(formatted_top_movies_results, [])
+            print(display_str)
+        elif "movies of actor" in user_query.lower() or "movies of actress" in user_query.lower():
+            movies_by_actor_results = search_movies_by_actor(user_query)
+            if not movies_by_actor_results:
+                print("No results found for actor/actress.")
+            formatted_movies_by_actor_results = format_results(movies_by_actor_results)
+            display_str = display_results(formatted_movies_by_actor_results, [])
             print(display_str)
         else:
             results = search_movies(user_query)
