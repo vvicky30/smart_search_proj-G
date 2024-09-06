@@ -5,6 +5,9 @@ env/
 .env/
 smart_search_env/
 
+#postgre data-base configuration file  
+config.py
+
 # VSCode settings
 .vscode/
 
