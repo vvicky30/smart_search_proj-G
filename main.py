@@ -334,6 +334,7 @@ def display_results(movies, overviews):
     else: # else , meaning nothing paased in this display function then 
         return [] #return nothing 
 
+
 def main():
     while True:
         user_query = input("Enter your query (or 'thanks, I am done here' to exit): ").strip()
