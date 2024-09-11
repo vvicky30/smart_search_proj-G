@@ -100,6 +100,7 @@ def process_query(query):
         # this will capture the actress'/actor's name for searching his top 7 movies
         r'movies of (actor|actress) (.+)',  # Flexible match for both actor and actress
         #r'movies of (.+)',  # Catch-all for other cases like actor/actress with misspelling  //fallback for other cases
+        r'movies of director (.+) from (\d{4}) to (\d{4})',  # regex for director with date-range
         r'movies of director (.+)'  #regex for director  
     ]
   
@@ -120,6 +121,12 @@ def process_query(query):
                 director_name = match.group(1)
                 corrected_director_name = complete_correct_director(director_name)
                 return corrected_director_name
+            elif case == r'movies of director (.+) from (\d{4}) to (\d{4})':  # <-- Handling director and date range
+                director_name = match.group(1) # capturing director's name 
+                from_date = match.group(2) # capeturing from_date
+                to_date = match.group(3) #capturing to_date
+                corrected_director_name = complete_correct_director(director_name)# correcting and completing director's name with the help of function 
+                return corrected_director_name, from_date, to_date# returning director's name , from_date and to_date 
             else:
                 # For movie names in context of retriving overviews, use the complete_correct function
                 processed_query = match.group(1)
