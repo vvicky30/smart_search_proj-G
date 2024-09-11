@@ -99,7 +99,7 @@ def process_query(query):
         r'top 5 movies from year (\d{4})', # this will capture the release year for searching top 5 movies corresponds to it.
         # this will capture the actress'/actor's name for searching his top 7 movies
         r'movies of (actor|actress) (.+)',  # Flexible match for both actor and actress
-        r'movies of (.+)',  # Catch-all for other cases like actor/actress with misspelling  //fallback for other cases
+        #r'movies of (.+)',  # Catch-all for other cases like actor/actress with misspelling  //fallback for other cases
         r'movies of director (.+)'  #regex for director  
     ]
   
@@ -113,7 +113,7 @@ def process_query(query):
                 # If the case is for capturing the year, return the year directly without correction
                 return match.group(1)
             elif case in [r'movies of (actor|actress) (.+)', r'movies of (.+)']:
-                actor_name = match.group(2) if case == r'movies of (actor|actress) (.+)' else match.group(1)# capture actor/actress name 
+                actor_name = match.group(2) #if case == r'movies of (actor|actress) (.+)' else match.group(1)   # capture actor/actress name 
                 corrected_actor_name = complete_correct_actors(actor_name)# then comple and correct the actor/actress name by passing captured name to the function: complete_correct_actors.
                 return corrected_actor_name # retrun corrected name.
             elif case == r'movies of director (.+)':  # <-- Handling director name
