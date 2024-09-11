@@ -339,6 +339,36 @@ def search_movies_by_director(query):
     except Exception as e:
         print(f"ERROR in searching for movies by director: {e}")
         return []
+#This function will query the PostgreSQL database to find movies directed by the given director and within the specified date range:
+def search_movies_by_director_and_date_range(query):
+    result = process_query(query)
+    
+    if not result or len(result) < 3:  # len(result) < 3 means process_query fn returned not all three values like director's name, from_date and to_date 
+                                       #or one value among them is missing then we print this error  
+        print("No valid director name or date range found.")
+        return []  # search function will return nothing 
+    
+    director_name, from_date, to_date = result # un pack the values and save it to corresponding variables
+    director_name = director_name.strip('"').replace("'", "''")
+    
+    final_query = f"""
+        SELECT * FROM movies.movies
+        WHERE director_name ILIKE '%{director_name}%'
+        AND release_year BETWEEN {from_date} AND {to_date}
+        ORDER BY tmdb_rating DESC
+        LIMIT 10;
+    """
+    
+    print(f"Executing SQL Query... : {final_query}")
+    session = SessionLocal()
+    try:
+        results = session.execute(text(final_query)).fetchall()
+        print(f"Number of results found: {len(results)}")
+        return results
+    except Exception as e:
+        print(f"ERROR in searching for movies by director and date range: {e}")
+        return []
+
 
 #The Decimal issue occurs because SQLAlchemy uses Python's Decimal type for precise decimal arithmetic, which is why it is displaying Decimal('value').
 #To convert it to a float or string for display purposes, 
@@ -422,6 +452,14 @@ def main():
             formatted_movies_by_director_results = format_results(movies_by_director_results)
             display_str = display_results(formatted_movies_by_director_results, [])
             print(display_str)
+        elif "movies of director" in user_query.lower() and "from" in user_query.lower() and "to" in user_query.lower():
+            #condition for director and date range
+            movies_by_director_and_date_results = search_movies_by_director_and_date_range(user_query)
+            if not movies_by_director_and_date_results:
+                print("No results found for director within the specified date range.")
+            formatted_movies_by_director_and_date_results = format_results(movies_by_director_and_date_results)
+            display_str = display_results(formatted_movies_by_director_and_date_results, [])
+            print(display_str)     
         else:
             results = search_movies(user_query)
             if not results:
