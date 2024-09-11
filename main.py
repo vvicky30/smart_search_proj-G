@@ -401,7 +401,7 @@ def main():
             formatted_top_movies_results = format_results(top_movies_results)
             display_str = display_results(formatted_top_movies_results, [])
             print(display_str)
-        elif "movies of actor" in user_query.lower() or "movies of actress" in user_query.lower() or "movies of" in user_query.lower():
+        elif "movies of actor" in user_query.lower() or "movies of actress" in user_query.lower():
             movies_by_actor_results = search_movies_by_actor(user_query)
             if not movies_by_actor_results:
                 print("No results found for actor/actress.")
