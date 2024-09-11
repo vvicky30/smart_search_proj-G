@@ -408,6 +408,13 @@ def main():
             formatted_movies_by_actor_results = format_results(movies_by_actor_results)
             display_str = display_results(formatted_movies_by_actor_results, [])
             print(display_str)
+        elif "movies of director" in user_query.lower():  # <-- Added condition for director search
+            movies_by_director_results = search_movies_by_director(user_query)
+            if not movies_by_director_results:
+                print("No results found for director.")
+            formatted_movies_by_director_results = format_results(movies_by_director_results)
+            display_str = display_results(formatted_movies_by_director_results, [])
+            print(display_str)
         else:
             results = search_movies(user_query)
             if not results:
