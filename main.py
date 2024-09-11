@@ -349,7 +349,7 @@ def search_movies_by_director_and_date_range(query):
         return []  # search function will return nothing 
     
     director_name, from_date, to_date = result # unpack the tuple values and save it to corresponding variables
-    director_name = director_name.strip('"').replace("'", "''")
+    director_name = str(director_name).strip('"').replace("'", "''")
     
     final_query = f"""
         SELECT * FROM movies.movies
