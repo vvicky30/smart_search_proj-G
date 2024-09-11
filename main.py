@@ -68,6 +68,22 @@ def complete_correct_actors(actor_name):
         print(f"ERROR in correcting/completing actor/actress name: {e}")
         return actor_name # if there is error in completing and correcting the actor/actress name then return original actor-name which was used by user while querying.
 
+#This function will correct and complete the director’s name, similar to how you handle the actor/actress names.
+def complete_correct_director(director_name):
+    prompt = f"Correct the spelling or complete the director's name: '{director_name}'"
+    try:
+        completion = client.completions.create(
+            model="gpt-3.5-turbo-instruct",
+            prompt=prompt,
+            max_tokens=6
+        )
+        corrected_director_name = completion.choices[0].text.strip().split('\n')[0]
+        print(f"Corrected/Completed Director Name: '{corrected_director_name}'")
+        return corrected_director_name
+    except Exception as e:
+        print(f"ERROR in correcting/completing director name: {e}")
+        return director_name #in the case of error:  return original director name as it's which is written by user while querying
+    
 def process_query(query): 
     # this function is take raw user's query and extract text from it .
     # Normalize the query
@@ -83,7 +99,8 @@ def process_query(query):
         r'top 5 movies from year (\d{4})', # this will capture the release year for searching top 5 movies corresponds to it.
         # this will capture the actress'/actor's name for searching his top 7 movies
         r'movies of (actor|actress) (.+)',  # Flexible match for both actor and actress
-        r'movies of (.+)'  # Catch-all for other cases like actor/actress with misspelling  //fallback for other cases
+        r'movies of (.+)',  # Catch-all for other cases like actor/actress with misspelling  //fallback for other cases
+        r'movies of director (.+)'  #regex for director  
     ]
   
     #his loop iterates through each regex pattern in the special_cases list.
@@ -99,6 +116,10 @@ def process_query(query):
                 actor_name = match.group(2) if case == r'movies of (actor|actress) (.+)' else match.group(1)# capture actor/actress name 
                 corrected_actor_name = complete_correct_actors(actor_name)# then comple and correct the actor/actress name by passing captured name to the function: complete_correct_actors.
                 return corrected_actor_name # retrun corrected name.
+            elif case == r'movies of director (.+)':  # <-- Handling director name
+                director_name = match.group(1)
+                corrected_director_name = complete_correct_director(director_name)
+                return corrected_director_name
             else:
                 # For movie names in context of retriving overviews, use the complete_correct function
                 processed_query = match.group(1)
@@ -288,6 +309,30 @@ def search_movies_by_actor(query):
     except Exception as e:
         print(f"ERROR in searching for movies by actor/actress: {e}")
         return []
+
+def search_movies_by_director(query):
+    director_name = process_query(query)
+    if not director_name:
+        print("No director name to search for.")
+        return []
+    
+    director_name = director_name.strip('"').replace("'", "''")
+    final_query = f"""
+        SELECT * FROM movies.movies
+        WHERE director_name ILIKE '%{director_name}%'
+        ORDER BY tmdb_rating DESC
+        LIMIT 10;
+    """
+    print(f"Executing SQL Query... : {final_query}")
+    session = SessionLocal()
+    try:
+        results = session.execute(text(final_query)).fetchall()
+        print(f"Number of results found: {len(results)}")
+        return results
+    except Exception as e:
+        print(f"ERROR in searching for movies by director: {e}")
+        return []
+
 #The Decimal issue occurs because SQLAlchemy uses Python's Decimal type for precise decimal arithmetic, which is why it is displaying Decimal('value').
 #To convert it to a float or string for display purposes, 
 #Resolving the problem: This function takes the results and formats any Decimal values to floats.
