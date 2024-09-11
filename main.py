@@ -104,7 +104,7 @@ def process_query(query):
         r'movies of director (.+)'  #regex for director  
     ]
   
-    #his loop iterates through each regex pattern in the special_cases list.
+    #this loop iterates through each regex pattern in the special_cases list.
     #re.search(case, query) attempts to match the regex pattern (case) to the query.
     for case in special_cases:
         match = re.search(case, query)
@@ -349,7 +349,7 @@ def search_movies_by_director_and_date_range(query):
         return []  # search function will return nothing 
     
     director_name, from_date, to_date = result # unpack the tuple values and save it to corresponding variables
-    director_name = str(director_name).strip('"').replace("'", "''")
+    director_name = director_name.strip('"').replace("'", "''")
     
     final_query = f"""
         SELECT * FROM movies.movies
@@ -445,21 +445,21 @@ def main():
             formatted_movies_by_actor_results = format_results(movies_by_actor_results)
             display_str = display_results(formatted_movies_by_actor_results, [])
             print(display_str)
-        elif "movies of director" in user_query.lower():  # <-- Added condition for director search
-            movies_by_director_results = search_movies_by_director(user_query)
-            if not movies_by_director_results:
-                print("No results found for director.")
-            formatted_movies_by_director_results = format_results(movies_by_director_results)
-            display_str = display_results(formatted_movies_by_director_results, [])
-            print(display_str)
-        elif "movies of director" in user_query.lower() and "from" in user_query.lower() and "to" in user_query.lower():
+        elif "movies of director" in user_query.lower() and "from" in user_query.lower() and "to" in user_query.lower():# <-- Added condition for director search alongwith date range
             #condition for director and date range
             movies_by_director_and_date_results = search_movies_by_director_and_date_range(user_query)
             if not movies_by_director_and_date_results:
                 print("No results found for director within the specified date range.")
             formatted_movies_by_director_and_date_results = format_results(movies_by_director_and_date_results)
             display_str = display_results(formatted_movies_by_director_and_date_results, [])
-            print(display_str)     
+            print(display_str) 
+        elif "movies of director" in user_query.lower():  # <-- Added condition for director search
+            movies_by_director_results = search_movies_by_director(user_query)
+            if not movies_by_director_results:
+                print("No results found for director.")
+            formatted_movies_by_director_results = format_results(movies_by_director_results)
+            display_str = display_results(formatted_movies_by_director_results, [])
+            print(display_str)    
         else:
             results = search_movies(user_query)
             if not results:
