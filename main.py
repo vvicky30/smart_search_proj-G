@@ -93,7 +93,8 @@ def complete_correct_genre(genre_name):
             prompt=prompt,
             max_tokens=3  # limiting token to 3 as it will correct and complete the genre in the genre_list one by one  
         )
-        corrected_genre_name = completion.choices[0].text.strip().split('\n')[0]
+        genre_name1 = completion.choices[0].text.strip().split('\n')[0]
+        corrected_genre_name = genre_name1.title()# This will capitalize each word's first letter.
         print(f"Corrected/Completed Genre Name: '{corrected_genre_name}'")
         return corrected_genre_name
     except Exception as e:
@@ -551,13 +552,22 @@ def main():
             formatted_movies_by_director_and_date_results = format_results(movies_by_director_and_date_results)
             display_str = display_results(formatted_movies_by_director_and_date_results, [])
             print(display_str) 
+        elif "genres like" in user_query.lower() or  "genre like" in user_query.lower():
+            movies_by_genres_results = search_movies_by_genres(user_query)
+            if not movies_by_genres_results:
+                print("No results found for the specified genres.")
+            formatted_movies_by_genres_results = format_results(movies_by_genres_results)
+            display_str = display_results(formatted_movies_by_genres_results, [])
+            print(display_str)
+
         elif "movies of director" in user_query.lower():  # <-- Added condition for director search
             movies_by_director_results = search_movies_by_director(user_query)
             if not movies_by_director_results:
                 print("No results found for director.")
             formatted_movies_by_director_results = format_results(movies_by_director_results)
             display_str = display_results(formatted_movies_by_director_results, [])
-            print(display_str)    
+            print(display_str)
+            
         else:
             results = search_movies(user_query)
             if not results:
