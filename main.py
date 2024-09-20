@@ -430,6 +430,36 @@ def search_movies_by_director_and_date_range(query):
         print(f"ERROR in searching for movies by director and date range: {e}")
         return []
 
+def search_movies_by_genres(query):
+    genres = process_query(query) # storing corrected gnere_list in genres 
+    if not genres or not isinstance(genres, list):
+        print("No genre names to search for.")
+        return []
+    # making genre conditions:This part creates a list of SQL conditions for each genre in the genres list. where genres is a list of genre strings (e.g., ["adventure", "war", "drama"]).
+    #For each genre in this list, the expression creates a string condition:
+    #genre ILIKE '%adventure%'
+    #genre ILIKE '%war%'
+    #genre ILIKE '%drama%' 
+    genre_conditions = " OR ".join([f"genre ILIKE '%{genre}%'" for genre in genres]) #the join function combines them into a single string.
+          #" OR " is the separator used to join the conditions, meaning that the final string will look like this:genre ILIKE '%adventure%' OR genre ILIKE '%war%' OR genre ILIKE '%drama%'
+    
+    final_query = f"""
+        SELECT * FROM movies.movies
+        WHERE {genre_conditions}
+        ORDER BY tmdb_rating DESC
+        LIMIT 10;
+    """
+    
+    print(f"Executing SQL Query... : {final_query}")
+    session = SessionLocal()
+    try:
+        results = session.execute(text(final_query)).fetchall()
+        print(f"Number of results found: {len(results)}")
+        return results
+    except Exception as e:
+        print(f"ERROR in searching for movies by genres: {e}")
+        return []
+
 
 #The Decimal issue occurs because SQLAlchemy uses Python's Decimal type for precise decimal arithmetic, which is why it is displaying Decimal('value').
 #To convert it to a float or string for display purposes, 
