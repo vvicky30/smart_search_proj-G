@@ -115,11 +115,11 @@ def process_query(query):
                 # If the case is for capturing the year, return the year directly without correction
                 return match.group(1)
             elif case == r'movies of (actor|actress) (.+) from (\d{4}) to (\d{4})':
-                actor_name = match.group(2)
-                from_date = match.group(3)
-                to_date = match.group(4)
-                corrected_actor_name = complete_correct_actors(actor_name)
-                return corrected_actor_name, from_date, to_date  # Return all three values
+                actor_name = match.group(2) # capturing actor/actress' name 
+                from_date = match.group(3) # capturing from_date
+                to_date = match.group(4)  # capturing to_date
+                corrected_actor_name = complete_correct_actors(actor_name) # correcting and completing actor's name with the help of function 
+                return corrected_actor_name, from_date, to_date  # Return all three captured and corrected values.
             elif case in [r'movies of (actor|actress) (.+)', r'movies of (.+)']:
                 actor_name = match.group(2) #if case == r'movies of (actor|actress) (.+)' else match.group(1)   # capture actor/actress name 
                 corrected_actor_name = complete_correct_actors(actor_name)# then comple and correct the actor/actress name by passing captured name to the function: complete_correct_actors.
@@ -324,6 +324,35 @@ def search_movies_by_actor(query):
         print(f"ERROR in searching for movies by actor/actress: {e}")
         return []
 
+def search_movies_by_actor_and_date_range(query):
+    result = process_query(query)
+    if not result or len(result) < 3: # len(result) < 3 means process_query fn returned not all three values like actor's name, from_date and to_date 
+                                       #or one value among them is missing then we print this error
+        print("No valid actor/actress name or date range found.")
+        return [] # in this case fn will return nothing 
+    
+    actor_name, from_date, to_date = result # unpack the tuple values and save it to corresponding variables
+    actor_name = actor_name.strip('"').replace("'", "''")
+    
+    final_query = f"""
+        SELECT * FROM movies.movies
+        WHERE '{actor_name}' ILIKE ANY(top_5_actors) 
+        AND release_year BETWEEN {from_date} AND {to_date}
+        ORDER BY tmdb_rating DESC
+        LIMIT 10;
+    """
+    
+    print(f"Executing SQL Query... : {final_query}")
+    session = SessionLocal()
+    try:
+        results = session.execute(text(final_query)).fetchall()
+        print(f"Number of results found: {len(results)}")
+        return results
+    except Exception as e:
+        print(f"ERROR in searching for movies by actor/actress and date range: {e}")
+        return []
+
+
 def search_movies_by_director(query):
     director_name = process_query(query)
     if not director_name:
@@ -445,7 +474,14 @@ def main():
             formatted_top_movies_results = format_results(top_movies_results)
             display_str = display_results(formatted_top_movies_results, [])
             print(display_str)
-        elif "movies of actor" in user_query.lower() or "movies of actress" in user_query.lower():
+        elif "movies of actor" in user_query.lower() or "movies of actress" in user_query.lower() and "from" in user_query.lower() and "to" in user_query.lower(): #check for the actor/actress and date rang
+            movies_by_actor_and_date_results = search_movies_by_actor_and_date_range(user_query)
+            if not movies_by_actor_and_date_results:
+                print("No results found for actor within the specified date range.")
+            formatted_movies_by_actor_and_date_results = format_results(movies_by_actor_and_date_results)
+            display_str = display_results(formatted_movies_by_actor_and_date_results, [])
+            print(display_str)
+        elif "movies of actor" in user_query.lower() or "movies of actress" in user_query.lower(): # <-- Added condition for actor/actress movies search
             movies_by_actor_results = search_movies_by_actor(user_query)
             if not movies_by_actor_results:
                 print("No results found for actor/actress.")
