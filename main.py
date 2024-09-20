@@ -119,7 +119,8 @@ def process_query(query):
         r'movies of (actor|actress) (.+)',  # Flexible match for both actor and actress
         #r'movies of (.+)',  # Catch-all for other cases like actor/actress with misspelling  //fallback for other cases
         r'movies of director (.+) from (\d{4}) to (\d{4})',  # regex for director with date-range
-        r'movies of director (.+)'  #regex for director  
+        r'movies of director (.+)'  #regex for director 
+        r'genres? like (.+)'  # regex pattern to capture genres //genres?: Matches "genre" or "genres" (the ? makes the "s" optional). 
     ]
   
     #this loop iterates through each regex pattern in the special_cases list.
