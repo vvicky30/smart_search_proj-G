@@ -552,7 +552,7 @@ def main():
             formatted_movies_by_director_and_date_results = format_results(movies_by_director_and_date_results)
             display_str = display_results(formatted_movies_by_director_and_date_results, [])
             print(display_str) 
-        elif "genres like" in user_query.lower() or  "genre like" in user_query.lower():
+        elif "movies in genres like" in user_query.lower() or  "movies in genre like" in user_query.lower():
             movies_by_genres_results = search_movies_by_genres(user_query)
             if not movies_by_genres_results:
                 print("No results found for the specified genres.")
