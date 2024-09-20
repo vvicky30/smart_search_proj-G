@@ -83,6 +83,23 @@ def complete_correct_director(director_name):
     except Exception as e:
         print(f"ERROR in correcting/completing director name: {e}")
         return director_name #in the case of error:  return original director name as it's which is written by user while querying
+
+def complete_correct_genre(genre_name):
+    prompt = f"Correct the spelling or complete the genre name: '{genre_name}'"
+    
+    try:
+        completion = client.completions.create(
+            model="gpt-3.5-turbo-instruct",
+            prompt=prompt,
+            max_tokens=10
+        )
+        corrected_genre_name = completion.choices[0].text.strip().split('\n')[0]
+        print(f"Corrected/Completed Genre Name: '{corrected_genre_name}'")
+        return corrected_genre_name
+    except Exception as e:
+        print(f"ERROR in correcting/completing genre name: {e}")
+        return genre_name
+
     
 def process_query(query): 
     # this function is take raw user's query and extract text from it .
