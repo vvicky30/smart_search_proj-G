@@ -91,14 +91,14 @@ def complete_correct_genre(genre_name):
         completion = client.completions.create(
             model="gpt-3.5-turbo-instruct",
             prompt=prompt,
-            max_tokens=10
+            max_tokens=3  # limiting token to 3 as it will correct and complete the genre in the genre_list one by one  
         )
         corrected_genre_name = completion.choices[0].text.strip().split('\n')[0]
         print(f"Corrected/Completed Genre Name: '{corrected_genre_name}'")
         return corrected_genre_name
     except Exception as e:
         print(f"ERROR in correcting/completing genre name: {e}")
-        return genre_name
+        return genre_name #in the case of error:  return original genre  as it's, which is written by user while querying
 
     
 def process_query(query): 
