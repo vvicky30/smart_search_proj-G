@@ -152,6 +152,13 @@ def process_query(query):
                 to_date = match.group(3) #capturing to_date
                 corrected_director_name = complete_correct_director(director_name)# correcting and completing director's name with the help of function 
                 return corrected_director_name, from_date, to_date# returning director's name , from_date and to_date 
+            elif case == r'genres? like (.+)': # <-- Handling queries related to genre 
+                genre_string = match.group(1) # capturing strings regarding genre_name i.e. Adventure, crime, drama and war
+                genre_list = re.split(r',\s*|\s+and\s+', genre_string)  # Split by commas (",") or "and"
+                #uses a list comprehension to iterate through each genre in genre_list and applies the complete_correct_genre function to each one.
+                # This means each genre name will be individually corrected or completed, 
+                corrected_genres = [complete_correct_genre(genre) for genre in genre_list] # resulting in a new list called corrected_genres that contains the corrected versions of all the genres provided in the user's query.
+                return corrected_genres # finally return the list of corrected gnere. 
             else:
                 # For movie names in context of retriving overviews, use the complete_correct function
                 processed_query = match.group(1)
