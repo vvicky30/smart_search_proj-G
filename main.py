@@ -447,7 +447,7 @@ def search_movies_by_genres(query):
         SELECT * FROM movies.movies
         WHERE {genre_conditions}
         ORDER BY tmdb_rating DESC
-        LIMIT 10;
+        LIMIT 20;
     """
     
     print(f"Executing SQL Query... : {final_query}")
