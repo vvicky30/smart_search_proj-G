@@ -97,6 +97,7 @@ def process_query(query):
         r'overview of (.+) movie', #capturing movie_name for retrieving its overviews
         r'overview of (.+)',  #Alternate-query of overview of movies: capturing movie_name for retrieving its overviews
         r'top 5 movies from year (\d{4})', # this will capture the release year for searching top 5 movies corresponds to it.
+        r'movies of (actor|actress) (.+) from (\d{4}) to (\d{4})',  # regex for actor/actress with date-range
         # this will capture the actress'/actor's name for searching his top 7 movies
         r'movies of (actor|actress) (.+)',  # Flexible match for both actor and actress
         #r'movies of (.+)',  # Catch-all for other cases like actor/actress with misspelling  //fallback for other cases
@@ -113,6 +114,12 @@ def process_query(query):
             if case == r'top 5 movies from year (\d{4})':
                 # If the case is for capturing the year, return the year directly without correction
                 return match.group(1)
+            elif case == r'movies of (actor|actress) (.+) from (\d{4}) to (\d{4})':
+                actor_name = match.group(2)
+                from_date = match.group(3)
+                to_date = match.group(4)
+                corrected_actor_name = complete_correct_actors(actor_name)
+                return corrected_actor_name, from_date, to_date  # Return all three values
             elif case in [r'movies of (actor|actress) (.+)', r'movies of (.+)']:
                 actor_name = match.group(2) #if case == r'movies of (actor|actress) (.+)' else match.group(1)   # capture actor/actress name 
                 corrected_actor_name = complete_correct_actors(actor_name)# then comple and correct the actor/actress name by passing captured name to the function: complete_correct_actors.
@@ -273,7 +280,7 @@ def search_top_movies(query):
         LIMIT 5
     """
     print(f"Executing SQL Query... : {final_query}")
-
+    
     session = SessionLocal()
     try:
         results = session.execute(text(final_query)).fetchall()
