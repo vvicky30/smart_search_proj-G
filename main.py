@@ -441,9 +441,18 @@ def search_movies_by_genres(query):
     #genre ILIKE '%adventure%'
     #genre ILIKE '%war%'
     #genre ILIKE '%drama%' 
-    genre_conditions = " OR ".join([f"genre ILIKE '%{genre}%'" for genre in genres]) #the join function combines them into a single string.
-          #" OR " is the separator used to join the conditions, meaning that the final string will look like this:genre ILIKE '%adventure%' OR genre ILIKE '%war%' OR genre ILIKE '%drama%'
-    
+    genre_conditions = " AND ".join([f"genre ILIKE '%{genre}%'" for genre in genres]) #the join function combines them into a single string.
+          #" AND " is the separator used to join the conditions, meaning that the final string will look like this:genre ILIKE '%adventure%' AND genre ILIKE '%war%' AND genre ILIKE '%drama%'
+          #Example Scenario:
+          #Movie 1: "Action, Adventure"
+          #Movie 2: "War, Drama"
+          #Movie 3: "Action, War, Drama"
+          #If the user searches for genres like "action, war":
+
+         #With 'OR':
+         #Results: Movie 1 ("Action, Adventure"), Movie 2 ("War, Drama"), and Movie 3 ("Action, War, Drama") because each movie matches at least one of the genres.
+         #With 'AND':
+         #Results: Only Movie 3 ("Action, War, Drama") because it's the only movie that contains both "action" and "war" in the genre list.
     final_query = f"""
         SELECT * FROM movies.movies
         WHERE {genre_conditions}
