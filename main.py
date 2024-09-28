@@ -15,8 +15,7 @@ from openai import OpenAI
 # which allows us to interact with the OpenAI API
 client = OpenAI(
     api_key = os.getenv('OPENAI_API_KEY') # saving the key to aopenai's api_key object
-)
-  
+)  
 '''
     #gpt-3.5-turbo is the name of a specific variant of OpenAI's GPT-3 model.
     #gpt-3.5-turbo excels at understanding and generating human-like text, 
