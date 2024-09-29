@@ -153,6 +153,15 @@ def process_query(query):
                 to_date = match.group(3) #capturing to_date
                 corrected_director_name = complete_correct_director(director_name)# correcting and completing director's name with the help of function 
                 return corrected_director_name, from_date, to_date# returning director's name , from_date and to_date 
+            elif case == r'genres? like (.+) with ratings? (above|below) (\d+(\.\d+)?)':
+                genre_string = match.group(1)   # for genre
+                rating_comparison = match.group(2)  # 'above' or 'below'
+                rating_value = Decimal(match.group(3))  # Rating number (e.g., 8 or 6.47 in decimal as well are allowed)
+            
+                # Correct genres using complete_correct_genre
+                genre_list = re.split(r',\s*|\s+and\s+', genre_string) # Split by commas (",") or "and"
+                corrected_genres = [complete_correct_genre(genre) for genre in genre_list]
+                return corrected_genres, rating_comparison, rating_value
             elif case == r'genres? like (.+)': # <-- Handling queries related to genre 
                 genre_string = match.group(1) # capturing strings regarding genre_name i.e. Adventure, crime, drama and war
                 genre_list = re.split(r',\s*|\s+and\s+', genre_string)  # Split by commas (",") or "and"
