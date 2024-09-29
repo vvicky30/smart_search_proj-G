@@ -478,6 +478,7 @@ def search_movies_by_genres(query):
     except Exception as e:
         print(f"ERROR in searching for movies by genres: {e}")
         return []
+
 def searching_by_genre_rating(genres, rating_comparison, rating_value):
     # Construct genre conditions
     genre_conditions = " AND ".join([f"genre ILIKE '%{genre}%'" for genre in genres])
