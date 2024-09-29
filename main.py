@@ -479,15 +479,25 @@ def search_movies_by_genres(query):
         print(f"ERROR in searching for movies by genres: {e}")
         return []
 
-def searching_by_genre_rating(genres, rating_comparison, rating_value):
+def searching_by_genre_rating(query):
+    result = process_query(query)
+    # Unpack genres, rating_operator, and rating from result
+    if not result or len(result) < 3:
+        # If process_query didn't return all three values (genres, rating_operator, rating)
+        print("No valid genres or rating information found.")
+        return []
+
+    genres, rating_operator, rating = result
+
+    # Check if genres is a valid list
+    if not genres or not isinstance(genres, list):
+        print("No valid genre name found.")
+        return []
     # Construct genre conditions
     genre_conditions = " AND ".join([f"genre ILIKE '%{genre}%'" for genre in genres])
     
     # Construct rating condition (above or below)
-    if rating_comparison == "above":
-        rating_condition = f"tmdb_rating > {rating_value}"
-    else:
-        rating_condition = f"tmdb_rating < {rating_value}"
+    rating_condition = f"tmdb_rating {'>' if rating_operator == 'above' else '<'} {rating}"
     
     # Final SQL query to search for movies
     final_query = f"""
@@ -600,6 +610,14 @@ def main():
             formatted_movies_by_director_and_date_results = format_results(movies_by_director_and_date_results)
             display_str = display_results(formatted_movies_by_director_and_date_results, [])
             print(display_str) 
+        elif ("genres like" in user_query.lower() or "genre like" in user_query.lower()) and ("with ratings above" in user_query.lower() or "with ratings below" in user_query.lower()):                    
+            movies_by_genre_rating_results = searching_by_genre_rating(user_query)
+            if not movies_by_genre_rating_results:
+                print("No results found for the specified genres and rating.")
+            
+            formatted_movies_by_genre_rating_results = format_results(movies_by_genre_rating_results)
+            display_str = display_results(formatted_movies_by_genre_rating_results, [])
+            print(display_str)
         elif "genres like" in user_query.lower() or  "genre like" in user_query.lower():
             movies_by_genres_results = search_movies_by_genres(user_query)
             if not movies_by_genres_results:
