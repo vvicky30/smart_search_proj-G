@@ -588,7 +588,7 @@ def main():
             formatted_top_movies_results = format_results(top_movies_results)
             display_str = display_results(formatted_top_movies_results, [])
             print(display_str)
-        elif "movies of actor" in user_query.lower() or "movies of actress" in user_query.lower() and "from" in user_query.lower() and "to" in user_query.lower(): #check for the actor/actress and date rang
+        elif ("movies of actor" in user_query.lower() or "movies of actress" in user_query.lower()) and "from" in user_query.lower() and "to" in user_query.lower(): #check for the actor/actress and date rang
             movies_by_actor_and_date_results = search_movies_by_actor_and_date_range(user_query)
             if not movies_by_actor_and_date_results:
                 print("No results found for actor within the specified date range.")
