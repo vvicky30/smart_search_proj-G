@@ -478,6 +478,35 @@ def search_movies_by_genres(query):
     except Exception as e:
         print(f"ERROR in searching for movies by genres: {e}")
         return []
+def searching_by_genre_rating(genres, rating_comparison, rating_value):
+    # Construct genre conditions
+    genre_conditions = " AND ".join([f"genre ILIKE '%{genre}%'" for genre in genres])
+    
+    # Construct rating condition (above or below)
+    if rating_comparison == "above":
+        rating_condition = f"tmdb_rating > {rating_value}"
+    else:
+        rating_condition = f"tmdb_rating < {rating_value}"
+    
+    # Final SQL query to search for movies
+    final_query = f"""
+        SELECT * FROM movies.movies
+        WHERE {genre_conditions}
+        AND {rating_condition}
+        ORDER BY tmdb_rating DESC
+        LIMIT 10;
+    """
+    
+    print(f"Executing SQL Query... : {final_query}")
+    session = SessionLocal()
+    
+    try:
+        results = session.execute(text(final_query)).fetchall()
+        print(f"Number of results found: {len(results)}")
+        return results
+    except Exception as e:
+        print(f"ERROR in searching for movies by genres and rating: {e}")
+        return []
 
 
 #The Decimal issue occurs because SQLAlchemy uses Python's Decimal type for precise decimal arithmetic, which is why it is displaying Decimal('value').
