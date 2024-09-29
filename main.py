@@ -120,7 +120,7 @@ def process_query(query):
         #r'movies of (.+)',  # Catch-all for other cases like actor/actress with misspelling  //fallback for other cases
         r'movies of director (.+) from (\d{4}) to (\d{4})',  # regex for director with date-range
         r'movies of director (.+)',  #regex for director 
-        r'genres? like (.+) with ratings? (above|below) (\d+(\.\d+)?)'  # regex pattern for capturing genre and fassion of rating(above or below) and capturing decimal value(rating)
+        r'genres? like (.+) with ratings? (above|below) (\d+(\.\d+)?)',  # regex pattern for capturing genre and fassion of rating(above or below) and capturing decimal value(rating)
         r'genres? like (.+)'  # regex pattern to capture genres //genres?: Matches "genre" or "genres" (the ? makes the "s" optional). 
     ]
   
