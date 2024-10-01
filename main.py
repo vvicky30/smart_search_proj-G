@@ -448,6 +448,38 @@ def search_movies_by_director_and_date_range(query):
         print(f"ERROR in searching for movies by director and date range: {e}")
         return []
 
+#This function will query the PostgreSQL database to find movies directed by the given director_name and with rating filter (ex: with ratings above/below 8):
+def search_movies_by_director_and_date_range(query):
+    result = process_query(query)
+    
+    if not result or len(result) < 3:  # len(result) < 3 means process_query fn returned not all three values like director's name, rating operator and rating. 
+                                       #or one value among them is missing then we print this error  
+        print("No valid director name or rating found.")
+        return []  # search function will return nothing 
+    
+    director_name, rating_operator, rating = result # unpack the tuple values and save it to corresponding variables
+    director_name = director_name.strip('"').replace("'", "''")
+    # Construct rating condition (above or below)
+    rating_condition = f"tmdb_rating {'>' if rating_operator == 'above' else '<'} {rating}"
+     # Construct the SQL query with rating conditions and director
+    final_query = f"""
+        SELECT * FROM movies.movies
+        WHERE director_name ILIKE '%{director_name}%'
+        AND {rating_condition}
+        ORDER BY tmdb_rating DESC
+        LIMIT 10;
+    """
+    
+    print(f"Executing SQL Query... : {final_query}")
+    session = SessionLocal()
+    try:
+        results = session.execute(text(final_query)).fetchall()
+        print(f"Number of results found: {len(results)}")
+        return results
+    except Exception as e:
+        print(f"ERROR in searching for movies by director and date range: {e}")
+        return []
+
 def search_movies_by_genres(query):
     genres = process_query(query) # storing corrected gnere_list in genres 
     if not genres or not isinstance(genres, list):
