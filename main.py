@@ -135,6 +135,10 @@ def process_query(query):
             if case == r'top 5 movies from year (\d{4})':
                 # If the case is for capturing the year, return the year directly without correction
                 return match.group(1)
+            elif case == r'movies like (.+)': #<-for similarity search , capturing and correcting movie  
+                movie_name = match.group(1).strip()
+                corrected_movie_name = complete_correct(movie_name)  # Correct movie name if necessary
+                return corrected_movie_name
             elif case == r'movies of (actor|actress) (.+) from (\d{4}) to (\d{4})':
                 actor_name = match.group(2) # capturing actor/actress' name 
                 from_date = match.group(3) # capturing from_date
