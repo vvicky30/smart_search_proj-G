@@ -760,8 +760,7 @@ def main():
             #formatted_overview_results = format_results(overview_results)
             display_str = display_results(formatted_results, [])
             print(display_str)
-
                
-# Example usage
+
 if __name__ == "__main__":
     main()
