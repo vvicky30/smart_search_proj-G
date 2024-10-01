@@ -690,6 +690,13 @@ def main():
             formatted_top_movies_results = format_results(top_movies_results)
             display_str = display_results(formatted_top_movies_results, [])
             print(display_str)
+        elif "movies like" in user_query.lower():
+            similar_movies_results = search_similar_movies_by_genre(user_query)
+            if not similar_movies_results:
+                print(f"No similar movies found")
+            formatted_similar_movies = format_results(similar_movies_results)
+            display_str = display_results(formatted_similar_movies, [])
+            print(display_str)
         elif ("movies of actor" in user_query.lower() or "movies of actress" in user_query.lower()) and "from" in user_query.lower() and "to" in user_query.lower(): #check for the actor/actress and date rang
             movies_by_actor_and_date_results = search_movies_by_actor_and_date_range(user_query)
             if not movies_by_actor_and_date_results:
