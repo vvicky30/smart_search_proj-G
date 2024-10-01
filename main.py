@@ -563,8 +563,65 @@ def searching_by_genre_rating(query):
     except Exception as e:
         print(f"ERROR in searching for movies by genres and rating: {e}")
         return []
+#this function will Fetch the genres of the specified movie (like "Inception").
+# and then Search for other movies with similar genres from the movies table.
+def search_similar_movies_by_genre(query):
+    movie_name = process_query(query)
+    # Strip extra quotes(if any) from the processed query
+    movie_name = movie_name.strip('"')
+    #In SQL, single quotes are used to enclose string literals, and if your string contains an apostrophe (like in "Ocean's Eleven" movie),
+    # we need to escape it by doubling the single quote (''), not by replacing it with double quotes(").
+    # Replace single quotes in the processed query with two single quotes
+    movie_name = movie_name.replace("'", "''")
+    session = SessionLocal()
+    
+    # Step 1: Get the genres of the given movie
+   # Using a context manager for the session
+    with SessionLocal() as session:
+        # Step 1: Get the genres of the given movie
+        get_genres_query = f"""
+            SELECT genres
+            FROM movies.movies
+            WHERE movie_name ILIKE '%{movie_name}%'
+            LIMIT 1;
+        """
+        try:
+            result = session.execute(text(query)).fetchone() #here we used fetchone() instead of fetchall()
+            if result is None:
+                    print(f"No genres found for movie: {movie_name}")
+                    return []
+        # Since the query is limited to one row (LIMIT 1), fetchone() will return that one row as a tuple (or None if no row is found). it Avoids unnecessary memory usage
+        except Exception as e:
+            print(f"ERROR in searching genres for movie {movie_name}: {e}") 
+            return []
+    
+        # Fetch the movie genres (as a comma-separated string)
+        movie_genres = result[0]
 
+        # Step 2: Split the genres into a list
+        movie_genres_list = [genre.strip() for genre in movie_genres.split(',')]
 
+        # Step 3: Build the SQL query to search for similar movies
+        genre_conditions = " AND ".join([f"genre ILIKE '%{genre}%'" for genre in movie_genres_list])
+
+        similar_movies_query = f"""
+            SELECT * 
+            FROM movies.movies 
+            WHERE {genre_conditions}
+            ORDER BY tmdb_rating DESC
+            LIMIT 10;
+        """
+
+        print(f"Executing SQL Query... : {similar_movies_query}")
+
+        # Step 4: Execute the query and fetch results
+        try:
+            similar_movies_results = session.execute(text(similar_movies_query)).fetchall()#If we were expecting multiple rows then we would use fetchall() to retrieve them all.
+            print(f"Number of similar movies found: {len(similar_movies_results)}")
+            return similar_movies_results
+        except Exception as e:
+            print(f"ERROR in searching movies similar to {movie_name}: {e}")
+            return []
 #The Decimal issue occurs because SQLAlchemy uses Python's Decimal type for precise decimal arithmetic, which is why it is displaying Decimal('value').
 #To convert it to a float or string for display purposes, 
 #Resolving the problem: This function takes the results and formats any Decimal values to floats.
