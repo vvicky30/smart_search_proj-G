@@ -608,7 +608,7 @@ def search_similar_movies_by_genre(query):
             SELECT * 
             FROM movies.movies 
             WHERE {genre_conditions}
-            AND movie_name ILIKE '%{movie_name}%' --To ensure that this similarity-search fn excludes the movie itself from the results
+            AND movie_name != '{movie_name}' --To ensure that this similarity-search fn excludes the movie itself from the results
             ORDER BY tmdb_rating DESC
             LIMIT 10;
         """
