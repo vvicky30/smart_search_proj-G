@@ -449,7 +449,7 @@ def search_movies_by_director_and_date_range(query):
         return []
 
 #This function will query the PostgreSQL database to find movies directed by the given director_name and with rating filter (ex: with ratings above/below 8):
-def search_movies_by_director_and_date_range(query):
+def searching_by_director_and_rating(query):
     result = process_query(query)
     
     if not result or len(result) < 3:  # len(result) < 3 means process_query fn returned not all three values like director's name, rating operator and rating. 
@@ -642,9 +642,16 @@ def main():
             formatted_movies_by_actor_results = format_results(movies_by_actor_results)
             display_str = display_results(formatted_movies_by_actor_results, [])
             print(display_str)
+        elif ("movies of director" in user_query.lower()) and ("with ratings above" in user_query.lower() or "with ratings below" in user_query.lower()): # <-- Added condition for director search alongwith rating filter.
+            movies_by_director_and_rating_results = searching_by_director_and_rating(user_query) 
+            if not movies_by_director_and_rating_results:
+                print("No results found for the specified director and rating.")
+            formatted_movies_by_director_and_rating_results = format_results(movies_by_director_and_rating_results)
+            display_str = display_results(formatted_movies_by_director_and_rating_results,[])
+            print(display_str)
         elif "movies of director" in user_query.lower() and "from" in user_query.lower() and "to" in user_query.lower():# <-- Added condition for director search alongwith date range
             #condition for director and date range
-            movies_by_director_and_date_results = search_movies_by_director_and_date_range(user_query)
+            movies_by_director_and_date_results = search_movies_by_director_and_date_range(user_query) 
             if not movies_by_director_and_date_results:
                 print("No results found for director within the specified date range.")
             formatted_movies_by_director_and_date_results = format_results(movies_by_director_and_date_results)
