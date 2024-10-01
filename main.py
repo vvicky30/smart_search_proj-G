@@ -114,6 +114,7 @@ def process_query(query):
         r'overview of (.+) movie', #capturing movie_name for retrieving its overviews
         r'overview of (.+)',  #Alternate-query of overview of movies: capturing movie_name for retrieving its overviews
         r'top 5 movies from year (\d{4})', # this will capture the release year for searching top 5 movies corresponds to it.
+        r'movies like (.+)',  # Added for similarity search
         r'movies of (actor|actress) (.+) from (\d{4}) to (\d{4})',  # regex for actor/actress with date-range
         # this will capture the actress'/actor's name for searching his top 7 movies
         r'movies of (actor|actress) (.+)',  # Flexible match for both actor and actress
