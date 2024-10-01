@@ -586,7 +586,7 @@ def search_similar_movies_by_genre(query):
             LIMIT 1;
         """
         try:
-            result = session.execute(text(query)).fetchone() #here we used fetchone() instead of fetchall()
+            result = session.execute(text(get_genres_query)).fetchone() #here we used fetchone() instead of fetchall()
             if result is None:
                     print(f"No genres found for movie: {movie_name}")
                     return []
