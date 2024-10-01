@@ -580,7 +580,7 @@ def search_similar_movies_by_genre(query):
     with SessionLocal() as session:
         # Step 1: Get the genres of the given movie
         get_genres_query = f"""
-            SELECT genres
+            SELECT genre
             FROM movies.movies
             WHERE movie_name ILIKE '%{movie_name}%'
             LIMIT 1;
